@@ -4,19 +4,19 @@ training_parser = argparse.ArgumentParser()
 training_parser.add_argument(
     '--image_dir',
     type=str,
-    default=r'E:\Datasets\flower_photos',
+    default=r'~/flower_photos',
     help='Path to folders of labeled images.'
 )
 training_parser.add_argument(
     '--output_graph',
     type=str,
-    default=r'E:\tf_proj2\output_graph.pb',
+    default=r'/tmp/output_graph.pb',
     help='Where to save the trained graph.'
 )
 training_parser.add_argument(
     '--intermediate_output_graphs_dir',
     type=str,
-    default=r'E:\tf_proj2\intermediate_graph',
+    default=r'/tmp/intermediate_graph',
     help='Where to save the intermediate graphs.'
 )
 training_parser.add_argument(
@@ -28,25 +28,25 @@ training_parser.add_argument(
 training_parser.add_argument(
     '--output_labels',
     type=str,
-    default=r'E:\tf_proj2\output_labels.txt',
+    default=r'/tmp/output_labels.txt',
     help=r'Where to save the trained graph\'s labels.'
 )
 training_parser.add_argument(
     '--summaries_dir',
     type=str,
-    default=r'E:\tf_proj2\retrain_logs',
+    default=r'/tmp/retrain_logs',
     help='Where to save summary logs for TensorBoard.'
 )
 training_parser.add_argument(
     '--how_many_training_steps',
     type=int,
-    default=500,
+    default=4000,
     help='How many training steps to run before ending.'
 )
 training_parser.add_argument(
     '--learning_rate',
     type=float,
-    default=1e-3,
+    default=1e-4,
     help='How large a learning rate to use when training.'
 )
 training_parser.add_argument(
@@ -128,7 +128,7 @@ training_parser.add_argument(
 training_parser.add_argument(
     '--bottleneck_dir',
     type=str,
-    default=r'E:\tf_proj2\bottleneck',
+    default=r'/tmp/bottleneck',
     help='Path to cache bottleneck layer values as files.'
 )
 training_parser.add_argument(
@@ -145,7 +145,7 @@ training_parser.add_argument(
 )
 training_parser.add_argument(
     '--flip_left_right',
-    default=True,
+    default=False,
     help=r'Randomly flip half of the images.',
     action='store_true'
 )
@@ -177,7 +177,7 @@ training_parser.add_argument(
 training_parser.add_argument(
     '--tfhub_module',
     type=str,
-    default='https://tfhub.dev/google/imagenet/inception_resnet_v2/feature_vector/1',
+    default='https://tfhub.dev/google/imagenet/inception_v3/feature_vector/1',
     help='Which TensorFlow Hub module to use.')
 
 training_parser.add_argument(
@@ -189,7 +189,7 @@ training_parser.add_argument(
 training_parser.add_argument(
     '--checkpoint_path',
     type=str,
-    default=r'E:\tf_proj2\checkpoints',
+    default=r'/tmp/checkpoints',
     help='Checkpoints location.')
 
 training_parser.add_argument(
