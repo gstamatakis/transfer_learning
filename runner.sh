@@ -10,7 +10,6 @@ python image_retraining.py \
 --checkpoint_path /tmp/e1/checkpoints \
 --min_images_per_label 20 \
 --max_images_per_label 1000000 \
---saved_model_dir  \
 --intermediate_store_frequency 500 \
 --learning_rate 0.001 \
 --beta1 0.9 \
