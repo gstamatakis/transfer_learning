@@ -26,7 +26,6 @@ python image_retraining.py \
 --validation_batch_size=128 \
 --final_tensor_name=final_result \
 --optimizer=adam \
---flip_left_right=False \
 --random_crop=0 \
 --random_scale=0 \
 --random_brightness=0 \
