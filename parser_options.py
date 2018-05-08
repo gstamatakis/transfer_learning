@@ -1,6 +1,6 @@
 import argparse
 
-training_parser = argparse.ArgumentParser()
+training_parser = argparse.ArgumentParser(description=r'Image retraining')
 training_parser.add_argument(
     '--image_dir',
     type=str,
