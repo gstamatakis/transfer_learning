@@ -178,7 +178,7 @@ training_parser.add_argument(
 training_parser.add_argument(
     '--tfhub_module',
     type=str,
-    default='"https://tfhub.dev/google/imagenet/nasnet_large/feature_vector/1',
+    default='https://tfhub.dev/google/imagenet/nasnet_large/feature_vector/1',
     help='Which TensorFlow Hub module to use.')
 
 training_parser.add_argument(

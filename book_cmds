@@ -1,6 +1,6 @@
 %cd /content/
 !ls
-!rm -rf e1 f.zip transfer_learning/ retraining/
+!rm -rf e2 f.zip transfer_learning/ retraining/
 
 !cd ~
 !apt-get install pkg-config zip g++ zlib1g-dev unzip python
