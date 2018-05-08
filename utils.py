@@ -15,7 +15,6 @@ import tensorflow_hub as hub
 from parser_options import FLAGS
 
 
-# TODO integrate
 def create_image_lists(image_dir, testing_percentage, validation_percentage):
     """Builds a list of training images from the file system.
 
