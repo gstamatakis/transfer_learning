@@ -10,13 +10,13 @@ training_parser.add_argument(
 training_parser.add_argument(
     '--output_graph',
     type=str,
-    default=r'/content/e2/output_graph.pb',
+    default=r'/content/exp/output_graph.pb',
     help='Where to save the trained graph.'
 )
 training_parser.add_argument(
     '--intermediate_output_graphs_dir',
     type=str,
-    default=r'/content/e2/intermediate_graph',
+    default=r'/content/exp/intermediate_graph',
     help='Where to save the intermediate graphs.'
 )
 training_parser.add_argument(
@@ -28,13 +28,13 @@ training_parser.add_argument(
 training_parser.add_argument(
     '--output_labels',
     type=str,
-    default=r'/content/e2/output_labels.txt',
+    default=r'/content/exp/output_labels.txt',
     help=r'Where to save the trained graph\'s labels.'
 )
 training_parser.add_argument(
     '--summaries_dir',
     type=str,
-    default=r'/content/e2/retrain_logs',
+    default=r'/content/exp/retrain_logs',
     help='Where to save summary logs for TensorBoard.'
 )
 training_parser.add_argument(
@@ -128,7 +128,7 @@ training_parser.add_argument(
 training_parser.add_argument(
     '--bottleneck_dir',
     type=str,
-    default=r'/content/e2/bottleneck',
+    default=r'/content/exp/bottleneck',
     help='Path to cache bottleneck layer values as files.'
 )
 training_parser.add_argument(
@@ -190,7 +190,7 @@ training_parser.add_argument(
 training_parser.add_argument(
     '--checkpoint_path',
     type=str,
-    default=r'/content/e2/checkpoints',
+    default=r'/content/exp/checkpoints',
     help='Checkpoints location.')
 
 training_parser.add_argument(
@@ -211,8 +211,8 @@ FAKE_QUANT_OPS = ('FakeQuantWithMinMaxVars', 'FakeQuantWithMinMaxVarsPerChannel'
 
 test_parser = argparse.ArgumentParser()
 test_parser.add_argument("--image", default="/content/flower_photos/daisy/5547758_eea9edfd54_n.jpg", help="image to be processed")
-test_parser.add_argument("--graph", default="/content/e2/output_graph.pb", help="graph/model to be executed")
-test_parser.add_argument("--labels", default="/content/e2/output_labels.txt", help="name of file containing labels")
+test_parser.add_argument("--graph", default="/content/exp/output_graph.pb", help="graph/model to be executed")
+test_parser.add_argument("--labels", default="/content/exp/output_labels.txt", help="name of file containing labels")
 test_parser.add_argument("--input_height", default=299, type=int, help="input height")
 test_parser.add_argument("--input_width", default=299, type=int, help="input width")
 test_parser.add_argument("--input_mean", default=0, type=int, help="input mean")

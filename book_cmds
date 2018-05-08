@@ -1,6 +1,6 @@
 %cd /content/
 !ls
-!rm -rf e2 f.zip transfer_learning/ retraining/
+!rm -rf exp f.zip transfer_learning/ retraining/
 
 !cd ~
 !apt-get install pkg-config zip g++ zlib1g-dev unzip python
@@ -11,14 +11,14 @@
 !rm -rf flower_photos.tgz
 
 !mkdir ~/retraining
-!mkdir /content/e2
+!mkdir /content/exp
 !cd ~/retraining
 !git clone https://github.com/gstamatakis/transfer_learning.git
 %cd transfer_learning
 
 !python3 image_retraining.py
 
-%cd /content/e2
+%cd /content/exp
 !rm -rf f.zip
 !zip -r f retrain_logs/
 
