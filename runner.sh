@@ -9,13 +9,13 @@ python image_retraining.py \
 --bottleneck_dir=/tmp/e1/bottleneck \
 --checkpoint_path=/tmp/e1/checkpoints \
 --min_images_per_label=20 \
---max_images_per_label=2e20 \
+--max_images_per_label=1000000 \
 --saved_model_dir= \
 --intermediate_store_frequency=500 \
---learning_rate=1e-3 \
+--learning_rate=0.001 \
 --beta1=0.9 \
 --beta2=0.999 \
---epsilogn=1e-8 \
+--epsilogn=0.00000001 \
 --decay=0.9 \
 --momentum=0.0 \
 --testing_percentage=10 \
