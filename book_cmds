@@ -1,0 +1,10 @@
+!cd ~
+!apt-get install pkg-config zip g++ zlib1g-dev unzip python
+!curl -LO http://download.tensorflow.org/example_images/flower_photos.tgz
+!tar xzf flower_photos.tgz
+!rm -rf flower_photos.tgz
+
+!mkdir ~/retraining
+!cd ~/retraining
+!git clone https://github.com/gstamatakis/transfer_learning.git
+
