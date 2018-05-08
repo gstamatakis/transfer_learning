@@ -40,7 +40,7 @@ training_parser.add_argument(
 training_parser.add_argument(
     '--how_many_training_steps',
     type=int,
-    default=500,
+    default=4000,
     help='How many training steps to run before ending.'
 )
 training_parser.add_argument(
@@ -100,7 +100,7 @@ training_parser.add_argument(
 training_parser.add_argument(
     '--train_batch_size',
     type=int,
-    default=32,  # 'MUST' be power of 2
+    default=32,
     help='How many images to train on at a time.'
 )
 training_parser.add_argument(
@@ -201,7 +201,7 @@ training_parser.add_argument(
 training_parser.add_argument(
     '--max_images_per_label',
     type=int,
-    default=2 ** 16,
+    default=1000000,
     help='Label folders with more than this number will NOT be used.')
 
 FLAGS, unparsed = training_parser.parse_known_args()
