@@ -1,6 +1,6 @@
 #!/bin/sh
 python image_retraining.py \
---image_dir '/tmp/flower_photos' \
+--image_dir='/tmp/flower_photos' \
 --output_graph '/tmp/e1/output_graph.pb' \
 --intermediate_output_graphs_dir '/tmp/e1/intermediate_graph' \
 --output_labels '/tmp/e1/output_labels.txt' \
