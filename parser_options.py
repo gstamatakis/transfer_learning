@@ -4,19 +4,19 @@ training_parser = argparse.ArgumentParser(description=r'Image retraining')
 training_parser.add_argument(
     '--image_dir',
     type=str,
-    default=r'E:\Datasets\flower_photos',
+    default=r'/content/flower_photos',
     help='Path to folders of labeled images.'
 )
 training_parser.add_argument(
     '--output_graph',
     type=str,
-    default=r'E:\tf_proj2\output_graph.pb',
+    default=r'/content/e1/output_graph.pb',
     help='Where to save the trained graph.'
 )
 training_parser.add_argument(
     '--intermediate_output_graphs_dir',
     type=str,
-    default=r'E:\tf_proj2\intermediate_graph',
+    default=r'/content/e1/intermediate_graph',
     help='Where to save the intermediate graphs.'
 )
 training_parser.add_argument(
@@ -28,13 +28,13 @@ training_parser.add_argument(
 training_parser.add_argument(
     '--output_labels',
     type=str,
-    default=r'E:\tf_proj2\output_labels.txt',
+    default=r'/content/e1/output_labels.txt',
     help=r'Where to save the trained graph\'s labels.'
 )
 training_parser.add_argument(
     '--summaries_dir',
     type=str,
-    default=r'E:\tf_proj2\retrain_logs',
+    default=r'/content/e1/retrain_logs',
     help='Where to save summary logs for TensorBoard.'
 )
 training_parser.add_argument(
@@ -128,7 +128,7 @@ training_parser.add_argument(
 training_parser.add_argument(
     '--bottleneck_dir',
     type=str,
-    default=r'E:\tf_proj2\bottleneck',
+    default=r'/content/e1/bottleneck',
     help='Path to cache bottleneck layer values as files.'
 )
 training_parser.add_argument(
@@ -177,7 +177,7 @@ training_parser.add_argument(
 training_parser.add_argument(
     '--tfhub_module',
     type=str,
-    default='https://tfhub.dev/google/imagenet/inception_resnet_v2/feature_vector/1',
+    default='https://tfhub.dev/google/imagenet/inception_v3/feature_vector/1',
     help='Which TensorFlow Hub module to use.')
 
 training_parser.add_argument(
@@ -189,7 +189,7 @@ training_parser.add_argument(
 training_parser.add_argument(
     '--checkpoint_path',
     type=str,
-    default=r'E:\tf_proj2\checkpoints',
+    default=r'/content/e1/checkpoints',
     help='Checkpoints location.')
 
 training_parser.add_argument(
@@ -209,9 +209,9 @@ FLAGS, unparsed = training_parser.parse_known_args()
 FAKE_QUANT_OPS = ('FakeQuantWithMinMaxVars', 'FakeQuantWithMinMaxVarsPerChannel')
 
 test_parser = argparse.ArgumentParser()
-test_parser.add_argument("--image", default="tensorflow/examples/label_image/data/grace_hopper.jpg", help="image to be processed")
-test_parser.add_argument("--graph", default="tensorflow/examples/label_image/data/inception_v3_2016_08_28_frozen.pb", help="graph/model to be executed")
-test_parser.add_argument("--labels", default="tensorflow/examples/label_image/data/imagenet_slim_labels.txt", help="name of file containing labels")
+test_parser.add_argument("--image", default="/content/flower_photos/daisy/5547758_eea9edfd54_n.jpg", help="image to be processed")
+test_parser.add_argument("--graph", default="/content/e1/output_graph.pb", help="graph/model to be executed")
+test_parser.add_argument("--labels", default="/content/e1/output_labels.txt", help="name of file containing labels")
 test_parser.add_argument("--input_height", default=299, type=int, help="input height")
 test_parser.add_argument("--input_width", default=299, type=int, help="input width")
 test_parser.add_argument("--input_mean", default=0, type=int, help="input mean")
