@@ -1,6 +1,7 @@
 !cd ~
 !apt-get install pkg-config zip g++ zlib1g-dev unzip python
 !pip install tensorflow_hub
+!apt-get install zip
 !curl -LO http://download.tensorflow.org/example_images/flower_photos.tgz
 !tar xzf flower_photos.tgz
 !rm -rf flower_photos.tgz
@@ -9,14 +10,12 @@
 !cd ~/retraining
 !git clone https://github.com/gstamatakis/transfer_learning.git
 %cd transfer_learning
-!git checkout exp1
 
 !python3 image_retraining.py
 
-%cd /content
-!tar -zcvf down1.tar.gz e1
-from google.colab import files
-with open('down1.tar.gz', 'w') as f:
-    f.write('ColabTar')
+%cd /content/e1
+!rm -rf f.zip
+!zip -r f retrain_logs/
 
-files.download('down1.tar.gz')
+from google.colab import files
+files.download('f.zip')
