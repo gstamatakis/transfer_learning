@@ -1,4 +1,5 @@
-python -m image_retraining \
+#!/bin/sh
+python image_retraining.py \
 --how_many_training_steps=4000 \
 --image_dir=/tmp/flower_photos \
 --output_graph=/tmp/e1/output_graph.pb \
