@@ -8,7 +8,7 @@
 !mkdir ~/retraining
 !cd ~/retraining
 !git clone https://github.com/gstamatakis/transfer_learning.git
-%cd transfer_learning/
+%cd transfer_learning
 !chmod u+x runner.sh
 
 !sh runner.sh
