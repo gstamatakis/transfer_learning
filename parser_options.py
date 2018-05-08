@@ -145,7 +145,7 @@ training_parser.add_argument(
 )
 training_parser.add_argument(
     '--flip_left_right',
-    default=True,
+    default=False,
     help=r'Randomly flip half of the images.',
     action='store_true'
 )
