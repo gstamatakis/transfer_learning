@@ -171,13 +171,14 @@ training_parser.add_argument(
       """
 )
 
+# "https://tfhub.dev/google/imagenet/nasnet_large/feature_vector/1"
 # "https://tfhub.dev/google/imagenet/inception_resnet_v2/feature_vector/1"
 # "https://tfhub.dev/google/imagenet/inception_v3/feature_vector/1"
-# "https://tfhub.dev/google/imagenet/mobilenet_v2_100_224/feature_vector/1"
+
 training_parser.add_argument(
     '--tfhub_module',
     type=str,
-    default='https://tfhub.dev/google/imagenet/inception_resnet_v2/feature_vector/1',
+    default='"https://tfhub.dev/google/imagenet/nasnet_large/feature_vector/1',
     help='Which TensorFlow Hub module to use.')
 
 training_parser.add_argument(
