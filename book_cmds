@@ -21,6 +21,5 @@
 %cd /content/exp
 !rm -rf f.zip
 !zip -r f retrain_logs/
-
 from google.colab import files
 files.download('f.zip')
