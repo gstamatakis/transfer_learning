@@ -40,13 +40,13 @@ training_parser.add_argument(
 training_parser.add_argument(
     '--how_many_training_steps',
     type=int,
-    default=8000,
+    default=16000,
     help='How many training steps to run before ending.'
 )
 training_parser.add_argument(
     '--learning_rate',
     type=float,
-    default=1e-4,
+    default=1e-5,
     help='How large a learning rate to use when training.'
 )
 training_parser.add_argument(
