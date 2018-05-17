@@ -140,7 +140,7 @@ training_parser.add_argument(
 training_parser.add_argument(
     '--optimizer',
     type=str,
-    default='sgd',
+    default='adam',
     help="The name of the output classification layer in the retrained graph."
 )
 training_parser.add_argument(
@@ -178,7 +178,7 @@ training_parser.add_argument(
 training_parser.add_argument(
     '--tfhub_module',
     type=str,
-    default='https://tfhub.dev/google/imagenet/nasnet_large/feature_vector/1',
+    default='https://tfhub.dev/google/imagenet/inception_resnet_v2/feature_vector/1',
     help='Which TensorFlow Hub module to use.')
 
 training_parser.add_argument(
