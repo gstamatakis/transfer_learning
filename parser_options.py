@@ -140,7 +140,7 @@ training_parser.add_argument(
 training_parser.add_argument(
     '--optimizer',
     type=str,
-    default='adam',
+    default='rmsprop',
     help="The name of the output classification layer in the retrained graph."
 )
 training_parser.add_argument(
