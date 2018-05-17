@@ -52,7 +52,7 @@ training_parser.add_argument(
 training_parser.add_argument(
     '--beta1',
     type=float,
-    default=0.95,
+    default=0.9,
     help='beta1 param of ADAM optimizer'
 )
 training_parser.add_argument(
