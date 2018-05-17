@@ -40,13 +40,13 @@ training_parser.add_argument(
 training_parser.add_argument(
     '--how_many_training_steps',
     type=int,
-    default=16000,
+    default=8000,
     help='How many training steps to run before ending.'
 )
 training_parser.add_argument(
     '--learning_rate',
     type=float,
-    default=1e-6,
+    default=1e-4,
     help='How large a learning rate to use when training.'
 )
 training_parser.add_argument(
@@ -140,7 +140,7 @@ training_parser.add_argument(
 training_parser.add_argument(
     '--optimizer',
     type=str,
-    default='adam',
+    default='rmsprop',
     help="The name of the output classification layer in the retrained graph."
 )
 training_parser.add_argument(
