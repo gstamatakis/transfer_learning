@@ -40,7 +40,7 @@ training_parser.add_argument(
 training_parser.add_argument(
     '--how_many_training_steps',
     type=int,
-    default=16000,
+    default=4000,
     help='How many training steps to run before ending.'
 )
 training_parser.add_argument(
