@@ -46,7 +46,7 @@ training_parser.add_argument(
 training_parser.add_argument(
     '--learning_rate',
     type=float,
-    default=1e-4,
+    default=1e-5,
     help='How large a learning rate to use when training.'
 )
 training_parser.add_argument(
@@ -140,31 +140,31 @@ training_parser.add_argument(
 training_parser.add_argument(
     '--optimizer',
     type=str,
-    default='sgd',
+    default='adam',
     help="The name of the output classification layer in the retrained graph."
 )
 training_parser.add_argument(
     '--flip_left_right',
-    default=False,
+    default=True,
     help=r'Randomly flip half of the images.',
     action='store_true'
 )
 training_parser.add_argument(
     '--random_crop',
     type=int,
-    default=0,
+    default=10,
     help='A percentage determining how much of a margin to randomly crop off the training images.'
 )
 training_parser.add_argument(
     '--random_scale',
     type=int,
-    default=0,
+    default=10,
     help=r'A percentage determining how much to randomly scale up the size of the training images by.'
 )
 training_parser.add_argument(
     '--random_brightness',
     type=int,
-    default=0,
+    default=10,
     help="""\
       A percentage determining how much to randomly multiply the training image
       input pixels up or down by.\
@@ -178,7 +178,7 @@ training_parser.add_argument(
 training_parser.add_argument(
     '--tfhub_module',
     type=str,
-    default='https://tfhub.dev/google/imagenet/inception_resnet_v2/feature_vector/1',
+    default='https://tfhub.dev/google/imagenet/nasnet_large/feature_vector/1',
     help='Which TensorFlow Hub module to use.')
 
 training_parser.add_argument(
