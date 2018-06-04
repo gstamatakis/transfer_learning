@@ -4,19 +4,19 @@ training_parser = argparse.ArgumentParser(description=r'Image retraining')
 training_parser.add_argument(
     '--image_dir',
     type=str,
-    default=r'/content/flower_photos',
+    default=r'E:\Datasets\flower_photos',
     help='Path to folders of labeled images.'
 )
 training_parser.add_argument(
     '--output_graph',
     type=str,
-    default=r'/content/exp/output_graph.pb',
+    default=r'E:\tf_proj1\output_graph.pb',
     help='Where to save the trained graph.'
 )
 training_parser.add_argument(
     '--intermediate_output_graphs_dir',
     type=str,
-    default=r'/content/exp/intermediate_graph',
+    default=r'E:\tf_proj1\intermediate_graph',
     help='Where to save the intermediate graphs.'
 )
 training_parser.add_argument(
@@ -28,25 +28,25 @@ training_parser.add_argument(
 training_parser.add_argument(
     '--output_labels',
     type=str,
-    default=r'/content/exp/output_labels.txt',
+    default=r'E:\tf_proj1\output_labels.txt',
     help=r'Where to save the trained graph\'s labels.'
 )
 training_parser.add_argument(
     '--summaries_dir',
     type=str,
-    default=r'/content/exp/retrain_logs',
+    default=r'E:\tf_proj1\retrain_logs',
     help='Where to save summary logs for TensorBoard.'
 )
 training_parser.add_argument(
     '--how_many_training_steps',
     type=int,
-    default=4000,
+    default=100,
     help='How many training steps to run before ending.'
 )
 training_parser.add_argument(
     '--learning_rate',
     type=float,
-    default=1e-5,
+    default=1e-3,
     help='How large a learning rate to use when training.'
 )
 training_parser.add_argument(
@@ -128,7 +128,7 @@ training_parser.add_argument(
 training_parser.add_argument(
     '--bottleneck_dir',
     type=str,
-    default=r'/content/exp/bottleneck',
+    default=r'E:\tf_proj1\bottleneck',
     help='Path to cache bottleneck layer values as files.'
 )
 training_parser.add_argument(
@@ -178,7 +178,7 @@ training_parser.add_argument(
 training_parser.add_argument(
     '--tfhub_module',
     type=str,
-    default='https://tfhub.dev/google/imagenet/nasnet_large/feature_vector/1',
+    default='https://tfhub.dev/google/imagenet/inception_resnet_v2/feature_vector/1',
     help='Which TensorFlow Hub module to use.')
 
 training_parser.add_argument(
@@ -190,7 +190,7 @@ training_parser.add_argument(
 training_parser.add_argument(
     '--checkpoint_path',
     type=str,
-    default=r'/content/exp/checkpoints',
+    default=r'E:\tf_proj1\checkpoints',
     help='Checkpoints location.')
 
 training_parser.add_argument(
@@ -207,16 +207,14 @@ training_parser.add_argument(
 
 FLAGS, unparsed = training_parser.parse_known_args()
 
-FAKE_QUANT_OPS = ('FakeQuantWithMinMaxVars', 'FakeQuantWithMinMaxVarsPerChannel')
-
 test_parser = argparse.ArgumentParser()
-test_parser.add_argument("--image", default="/content/flower_photos/daisy/5547758_eea9edfd54_n.jpg", help="image to be processed")
-test_parser.add_argument("--graph", default="/content/exp/output_graph.pb", help="graph/model to be executed")
-test_parser.add_argument("--labels", default="/content/exp/output_labels.txt", help="name of file containing labels")
+test_parser.add_argument("--image", default=r"E:\Datasets\flower_photos\daisy\5547758_eea9edfd54_n.jpg", help="image to be processed")
+test_parser.add_argument("--graph", default=r"E:\tf_proj1\output_graph.pb", help="graph/model to be executed")
+test_parser.add_argument("--labels", default=r"E:\tf_proj1\output_labels.txt", help="name of file containing labels")
 test_parser.add_argument("--input_height", default=299, type=int, help="input height")
 test_parser.add_argument("--input_width", default=299, type=int, help="input width")
 test_parser.add_argument("--input_mean", default=0, type=int, help="input mean")
 test_parser.add_argument("--input_std", default=255, type=int, help="input std")
-test_parser.add_argument("--input_layer", default="input", help="name of input layer")
-test_parser.add_argument("--output_layer", default="InceptionV3/Predictions/Reshape_1", help="name of output layer")
+test_parser.add_argument("--input_layer", default="Placeholder", help="name of input layer")
+test_parser.add_argument("--output_layer", default="final_result", help="name of output layer")
 testFLAGS = test_parser.parse_args()

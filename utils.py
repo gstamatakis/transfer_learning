@@ -99,9 +99,9 @@ def get_image_path(image_lists, label_name, index, image_dir, category):
     """Returns a path to an image for a label at the given index.
 
     Args:
-      image_lists: OrderedDict of training images for each label.
-      label_name: Label string we want to get an image for.
-      index: Int offset of the image we want. This will be moduloed by the
+      image_lists: Training images for each label.
+      label_name: The label name.
+      index: Int offset of the image we want. This will be moded (%) by the
       available number of images for the label, so it can be arbitrarily large.
       image_dir: Root folder string of the subfolders containing the training
       images.
@@ -110,16 +110,9 @@ def get_image_path(image_lists, label_name, index, image_dir, category):
 
     Returns:
       File system path string to an image that meets the requested parameters.
-
     """
-    if label_name not in image_lists:
-        tf.logging.fatal('Label does not exist %s.', label_name)
     label_lists = image_lists[label_name]
-    if category not in label_lists:
-        tf.logging.fatal('Category does not exist %s.', category)
     category_list = label_lists[category]
-    if not category_list:
-        tf.logging.fatal('Label %s has no images in the category %s.', label_name, category)
     mod_index = index % len(category_list)
     base_name = category_list[mod_index]
     sub_dir = label_lists['dir']
@@ -146,15 +139,11 @@ def create_module_graph(module_spec):
 
 
 def create_bottleneck_file(bottleneck_path, image_lists, label_name, index, image_dir, category, sess, jpeg_data_tensor, decoded_image_tensor, resized_input_tensor, bottleneck_tensor):
-    """Create a single bottleneck file."""
     tf.logging.info('Creating bottleneck at ' + bottleneck_path)
     image_path = get_image_path(image_lists, label_name, index, image_dir, category)
-    if not tf.gfile.Exists(image_path):
-        tf.logging.fatal('File does not exist %s', image_path)
     image_data = tf.gfile.FastGFile(image_path, 'rb').read()
     try:
-        # Runs inference on an image to extract the 'bottleneck' summary layer.
-        # First decode the JPEG image, resize it, and rescale the pixel values.
+        # Runs inference on an image to extract the 'bottleneck' summary layer. First decode the JPEG image, resize it, and rescale the pixel values.
         resized_input_values = sess.run(decoded_image_tensor, {jpeg_data_tensor: image_data})
         # Then run it through the recognition network.
         bottleneck_values = sess.run(bottleneck_tensor, {resized_input_tensor: resized_input_values})
@@ -254,18 +243,17 @@ def get_random_cached_bottlenecks(sess, images, how_many, category, bottleneck_d
     """
     class_count = len(images.keys())
     bottlenecks = []
-    ground_truths = []
+    labels = []
     filenames = []
     if how_many >= 0:
-        # Retrieve a random sample of bottlenecks.
-        for unused_i in range(how_many):
+        for _ in range(how_many):  # Retrieve a random sample of bottlenecks.
             label_index = random.randrange(class_count)
             label_name = list(images.keys())[label_index]
             image_idx = random.randrange(FLAGS.max_images_per_label + 1)
             image_name = get_image_path(images, label_name, image_idx, image_dir, category)
             bottleneck = get_or_create_bottleneck(sess, images, label_name, image_idx, image_dir, category, bottleneck_dir, jpeg_tensor, decoded_image_tensor, resized_input_tensor, bottleneck_tensor, module_name)
             bottlenecks.append(bottleneck)
-            ground_truths.append(label_index)
+            labels.append(label_index)
             filenames.append(image_name)
     else:
         # Retrieve all bottlenecks.
@@ -274,9 +262,9 @@ def get_random_cached_bottlenecks(sess, images, how_many, category, bottleneck_d
                 image_name = get_image_path(images, label_name, image_idx, image_dir, category)
                 bottleneck = get_or_create_bottleneck(sess, images, label_name, image_idx, image_dir, category, bottleneck_dir, jpeg_tensor, decoded_image_tensor, resized_input_tensor, bottleneck_tensor, module_name)
                 bottlenecks.append(bottleneck)
-                ground_truths.append(label_index)
+                labels.append(label_index)
                 filenames.append(image_name)
-    return bottlenecks, ground_truths, filenames
+    return bottlenecks, labels, filenames
 
 
 def get_random_distorted_bottlenecks(
@@ -307,7 +295,7 @@ def get_random_distorted_bottlenecks(
     """
     class_count = len(image_lists.keys())
     bottlenecks = []
-    ground_truths = []
+    labels = []
     for unused_i in range(how_many):
         label_index = random.randrange(class_count)
         label_name = list(image_lists.keys())[label_index]
@@ -323,8 +311,8 @@ def get_random_distorted_bottlenecks(
         bottleneck_values = sess.run(bottleneck_tensor, {resized_input_tensor: distorted_image_data})
         bottleneck_values = np.squeeze(bottleneck_values)
         bottlenecks.append(bottleneck_values)
-        ground_truths.append(label_index)
-    return bottlenecks, ground_truths
+        labels.append(label_index)
+    return bottlenecks, labels
 
 
 def add_input_distortions(flip_left_right, random_crop, random_scale, random_brightness, module_spec):
@@ -411,19 +399,6 @@ def add_input_distortions(flip_left_right, random_crop, random_scale, random_bri
     return jpeg_data, distort_result
 
 
-def variable_summaries(var):
-    """Attach a lot of summaries to a Tensor (for TensorBoard visualization)."""
-    with tf.name_scope('summaries'):
-        mean = tf.reduce_mean(var)
-        tf.summary.scalar('mean', mean)
-        with tf.name_scope('stddev'):
-            stddev = tf.sqrt(tf.reduce_mean(tf.square(var - mean)))
-        tf.summary.scalar('stddev', stddev)
-        tf.summary.scalar('max', tf.reduce_max(var))
-        tf.summary.scalar('min', tf.reduce_min(var))
-        tf.summary.histogram('histogram', var)
-
-
 def add_final_retrain_ops(class_count, final_tensor_name, bottleneck_tensor, is_training):
     """Adds a new softmax and fully-connected layer for training and eval.
 
@@ -447,35 +422,23 @@ def add_final_retrain_ops(class_count, final_tensor_name, bottleneck_tensor, is_
       bottleneck input and ground truth input.
     """
     batch_size, bottleneck_tensor_size = bottleneck_tensor.get_shape().as_list()
-    assert batch_size is None, 'We want to work with arbitrary batch size.'
     with tf.name_scope('input'):
         bottleneck_input = tf.placeholder_with_default(bottleneck_tensor, shape=[batch_size, bottleneck_tensor_size], name='BottleneckInputPlaceholder')
-        ground_truth_input = tf.placeholder(tf.int64, [batch_size], name='GroundTruthInput')
+        label_input = tf.placeholder(tf.int64, [batch_size], name='GroundTruthInput')
 
-    # Organizing the following ops so they are easier to see in TensorBoard.
-    layer_name = 'final_retrain_ops'
-    with tf.name_scope(layer_name):
-        with tf.name_scope('weights'):
-            initial_value = tf.truncated_normal([bottleneck_tensor_size, class_count], stddev=0.001)
-            layer_weights = tf.Variable(initial_value, name='final_weights')
-            variable_summaries(layer_weights)
-        with tf.name_scope('biases'):
-            layer_biases = tf.Variable(tf.zeros([class_count]), name='final_biases')
-            variable_summaries(layer_biases)
-        with tf.name_scope('Wx_plus_b'):
-            logits = tf.matmul(bottleneck_input, layer_weights) + layer_biases
-            tf.summary.histogram('pre_activations', logits)
+    initial_value = tf.truncated_normal([bottleneck_tensor_size, class_count], stddev=0.001)
+    layer_weights = tf.Variable(initial_value, name='final_weights')
+    layer_biases = tf.Variable(tf.zeros([class_count]), name='final_biases')
+    logits = tf.matmul(bottleneck_input, layer_weights) + layer_biases
 
     final_tensor = tf.nn.softmax(logits, name=final_tensor_name)
 
-    tf.summary.histogram('activations', final_tensor)
-
-    # If this is an eval graph, we don't need to add loss ops or an optimizer.
+    # If this is an eval graph, we dont need to add loss ops or optimizer.
     if not is_training:
-        return None, None, bottleneck_input, ground_truth_input, final_tensor
+        return None, None, bottleneck_input, label_input, final_tensor
 
     with tf.name_scope('cross_entropy'):
-        cross_entropy_mean = tf.losses.sparse_softmax_cross_entropy(labels=ground_truth_input, logits=logits)
+        cross_entropy_mean = tf.losses.sparse_softmax_cross_entropy(labels=label_input, logits=logits)
 
     tf.summary.scalar('cross_entropy', cross_entropy_mean)
 
@@ -491,15 +454,15 @@ def add_final_retrain_ops(class_count, final_tensor_name, bottleneck_tensor, is_
             raise RuntimeError('Unknown optimizer: {0}'.format(opt))
 
         train_step = optimizer.minimize(cross_entropy_mean)
-    return train_step, cross_entropy_mean, bottleneck_input, ground_truth_input, final_tensor
+    return train_step, cross_entropy_mean, bottleneck_input, label_input, final_tensor
 
 
-def add_evaluation_step(result_tensor, ground_truth_tensor):
+def add_evaluation_step(result_tensor, label_tensor):
     """Inserts the operations we need to evaluate the accuracy of our results.
 
     Args:
       result_tensor: The new final node that produces results.
-      ground_truth_tensor: The node we feed ground truth data
+      label_tensor: The node we feed ground truth data
       into.
 
     Returns:
@@ -508,7 +471,7 @@ def add_evaluation_step(result_tensor, ground_truth_tensor):
     with tf.name_scope('accuracy'):
         with tf.name_scope('correct_prediction'):
             prediction = tf.argmax(result_tensor, 1)
-            correct_prediction = tf.equal(prediction, ground_truth_tensor)
+            correct_prediction = tf.equal(prediction, label_tensor)
         with tf.name_scope('accuracy'):
             evaluation_step = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
     tf.summary.scalar('accuracy', evaluation_step)
@@ -528,43 +491,31 @@ def run_final_eval(train_session, module_spec, class_count, image_lists, jpeg_da
       resized_image_tensor: The input node of the recognition graph.
       bottleneck_tensor: The bottleneck output layer of the CNN graph.
     """
-    test_bottlenecks, test_ground_truth, test_filenames = (get_random_cached_bottlenecks(
+    test_bottlenecks, test_label, test_filenames = (get_random_cached_bottlenecks(
         train_session, image_lists, FLAGS.test_batch_size, 'testing', FLAGS.bottleneck_dir, FLAGS.image_dir, jpeg_data_tensor, decoded_image_tensor, resized_image_tensor, bottleneck_tensor, FLAGS.tfhub_module))
 
-    (eval_session, _, bottleneck_input, ground_truth_input, evaluation_step, prediction) = build_eval_session(module_spec, class_count)
-    test_accuracy, predictions = eval_session.run([evaluation_step, prediction], feed_dict={bottleneck_input: test_bottlenecks, ground_truth_input: test_ground_truth})
+    (eval_session, _, bottleneck_input, label_input, evaluation_step, prediction) = build_eval_session(module_spec, class_count)
+    test_accuracy, predictions = eval_session.run([evaluation_step, prediction], feed_dict={bottleneck_input: test_bottlenecks, label_input: test_label})
     tf.logging.info('Test accuracy = %.1f%% (N=%d)' % (test_accuracy * 100, len(test_bottlenecks)))
 
 
 def build_eval_session(module_spec, class_count):
-    """Builds an restored eval session without train operations for exporting.
-
-    Args:
-      module_spec: The hub.ModuleSpec for the image module being used.
-      class_count: Number of classes
-
-    Returns:
-      Eval session containing the restored eval graph.
-      The bottleneck input, ground truth, eval step, and prediction tensors.
-    """
+    """Builds an restored eval session without train operations for exporting."""
 
     eval_graph, bottleneck_tensor, resized_input_tensor = create_module_graph(module_spec)
 
     eval_sess = tf.Session(graph=eval_graph)
     with eval_graph.as_default():
         # Add the new layer for exporting.
-        (_, _, bottleneck_input, ground_truth_input, final_tensor) = add_final_retrain_ops(class_count, FLAGS.final_tensor_name, bottleneck_tensor, is_training=False)
-
+        (_, _, bottleneck_input, label_input, final_tensor) = add_final_retrain_ops(class_count, FLAGS.final_tensor_name, bottleneck_tensor, is_training=False)
         # Now we need to restore the values from the training graph to the eval graph.
         tf.train.Saver().restore(eval_sess, FLAGS.checkpoint_path)
+        evaluation_step, prediction = add_evaluation_step(final_tensor, label_input)
 
-        evaluation_step, prediction = add_evaluation_step(final_tensor, ground_truth_input)
-
-    return eval_sess, resized_input_tensor, bottleneck_input, ground_truth_input, evaluation_step, prediction
+    return eval_sess, resized_input_tensor, bottleneck_input, label_input, evaluation_step, prediction
 
 
 def save_graph_to_file(graph_file_name, module_spec, class_count):
-    """Saves an graph to file."""
     sess, _, _, _, _, _ = build_eval_session(module_spec, class_count)
     graph = sess.graph
 
@@ -574,17 +525,6 @@ def save_graph_to_file(graph_file_name, module_spec, class_count):
         f.write(output_graph_def.SerializeToString())
 
 
-def prepare_file_system():
-    # Set up the directory we'll write summaries to for TensorBoard
-    if tf.gfile.Exists(FLAGS.summaries_dir):
-        tf.gfile.DeleteRecursively(FLAGS.summaries_dir)
-    tf.gfile.MakeDirs(FLAGS.summaries_dir)
-    if FLAGS.intermediate_store_frequency > 0 and not os.path.exists(FLAGS.intermediate_output_graphs_dir):
-        os.makedirs(FLAGS.intermediate_output_graphs_dir)
-    return
-
-
-# TODO try to optimize this func
 def add_jpeg_decoding(module_spec):
     """Adds operations that perform JPEG decoding and resizing to the graph..
 
