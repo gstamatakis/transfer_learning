@@ -44,7 +44,7 @@ training_parser.add_argument(
 training_parser.add_argument(
     '--how_many_training_steps',
     type=int,
-    default=100,
+    default=1000,
     help='How many training steps to run before ending.'
 )
 training_parser.add_argument(
@@ -200,7 +200,7 @@ training_parser.add_argument(
 training_parser.add_argument(
     '--repeat',
     type=int,
-    default=3,
+    default=2,
     help='Repeat training with data augmentation enabled for this many rounds. (eg. 4 means that a single image will be fed 5 times in the network).')
 
 training_parser.add_argument(

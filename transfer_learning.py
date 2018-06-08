@@ -104,10 +104,10 @@ def main(_):
                 tf.logging.info('Save intermediate result to : ' + intermediate_file_name)
                 save_graph_to_file(intermediate_file_name, module_spec, class_count)
 
-        # If data augmentation is enabled repeat training for a fixed amount of rounds with distorted images.
+        # If data augmentation is enabled continue training for a fixed amount of rounds with just distorted images.
         if has_distoreted_images:
-            tf.logging.info('Repeating training since Data Augmentation is enabled for {0} round(s).'.format(repeat))
-            for i in range(repeat * training_steps):
+            tf.logging.info('Repeating training for {0} round(s) since Data Augmentation is enabled.'.format(repeat))
+            for i in range(training_steps, repeat * training_steps):
                 try:
                     (train_bottlenecks, train_labels) = get_distorted_bottlenecks(sess, image_lists, FLAGS.train_batch_size, 'training', FLAGS.image_dir, distorted_jpeg_data_tensor, distorted_image_tensor, resized_image_tensor, bottleneck_tensor)
                     train_summary, _ = sess.run([merged, train_step], feed_dict={bottleneck_input: train_bottlenecks, labels_input: train_labels})
