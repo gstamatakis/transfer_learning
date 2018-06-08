@@ -67,26 +67,24 @@ def main(_):
 
         train_writer = tf.summary.FileWriter(FLAGS.summaries_dir + '/train', sess.graph)
         validation_writer = tf.summary.FileWriter(FLAGS.summaries_dir + '/validation')
-
         # Create a train saver that is used for restoring/exporting models.
         train_saver = tf.train.Saver()
 
-        intermediate_frequency = FLAGS.intermediate_store_frequency
-        eval_step_interval = FLAGS.eval_step_interval
-        training_steps = FLAGS.how_many_training_steps
-        repeat = FLAGS.repeat
-
-        # Train for the requested amount of steps.
-        for i in range(training_steps):
+        # Run the training for as many cycles as requested on the command line.
+        for i in range(FLAGS.how_many_training_steps):
             try:
-                # Get a batch of input bottleneck values from the cache stored on disk.
-                (train_bottlenecks, train_labels, _) = get_cached_bottlenecks(sess, image_lists, FLAGS.train_batch_size, 'training', FLAGS.bottleneck_dir, FLAGS.image_dir, jpeg_data_tensor, decoded_image_tensor, resized_image_tensor, bottleneck_tensor, FLAGS.tfhub_module)
+                # Get a batch of input bottleneck values, either calculated fresh every time with distortions applied, or from the cache stored on disk.
+                if has_distoreted_images:
+                    (train_bottlenecks, train_labels) = get_distorted_bottlenecks(sess, image_lists, FLAGS.train_batch_size, 'training', FLAGS.image_dir, distorted_jpeg_data_tensor, distorted_image_tensor, resized_image_tensor, bottleneck_tensor)
+                else:
+                    (train_bottlenecks, train_labels, _) = get_cached_bottlenecks(sess, image_lists, FLAGS.train_batch_size, 'training', FLAGS.bottleneck_dir, FLAGS.image_dir, jpeg_data_tensor,decoded_image_tensor, resized_image_tensor, bottleneck_tensor, FLAGS.tfhub_module)
+
                 # Feed the bottlenecks and ground truth into the graph, and run a training step. Capture training summaries for TensorBoard with the `merged` op.
                 train_summary, _ = sess.run([merged, train_step], feed_dict={bottleneck_input: train_bottlenecks, labels_input: train_labels})
                 train_writer.add_summary(train_summary, i)
 
-                # Regularly print out how well the graph is training.
-                if i % eval_step_interval == 0 or i + 1 == training_steps:
+                # Every so often, print out how well the graph is training.
+                if i % FLAGS.eval_step_interval == 0 or i + 1 == FLAGS.how_many_training_steps:
                     train_accuracy, cross_entropy_value = sess.run([evaluation_step, cross_entropy], feed_dict={bottleneck_input: train_bottlenecks, labels_input: train_labels})
                     validation_bottlenecks, validation_labels, _ = get_cached_bottlenecks(sess, image_lists, FLAGS.validation_batch_size, 'validation', FLAGS.bottleneck_dir, FLAGS.image_dir, jpeg_data_tensor, decoded_image_tensor, resized_image_tensor, bottleneck_tensor, FLAGS.tfhub_module)
                     # Run the validation step
@@ -97,35 +95,15 @@ def main(_):
                 tf.logging.info('%s: Keyboard Interrupt, will stop training')
                 break
 
+            # Store intermediate results
+            intermediate_frequency = FLAGS.intermediate_store_frequency
+
             if intermediate_frequency > 0 and i % intermediate_frequency == 0 and i > 0:
                 # If we want to do an intermediate save, save a checkpoint of the train graph, to restore into the eval graph.
                 train_saver.save(sess, FLAGS.checkpoint_path)
                 intermediate_file_name = (FLAGS.intermediate_output_graphs_dir + 'intermediate_' + str(i) + '.pb')
                 tf.logging.info('Save intermediate result to : ' + intermediate_file_name)
                 save_graph_to_file(intermediate_file_name, module_spec, class_count)
-
-        # If data augmentation is enabled continue training for a fixed amount of rounds with just distorted images.
-        if has_distoreted_images:
-            tf.logging.info('Repeating training for {0} round(s) since Data Augmentation is enabled.'.format(repeat))
-            for i in range(training_steps, repeat * training_steps):
-                try:
-                    (train_bottlenecks, train_labels) = get_distorted_bottlenecks(sess, image_lists, FLAGS.train_batch_size, 'training', FLAGS.image_dir, distorted_jpeg_data_tensor, distorted_image_tensor, resized_image_tensor, bottleneck_tensor)
-                    train_summary, _ = sess.run([merged, train_step], feed_dict={bottleneck_input: train_bottlenecks, labels_input: train_labels})
-                    train_writer.add_summary(train_summary, i)
-                    if i % eval_step_interval == 0 or i + 1 == repeat * training_steps:
-                        train_accuracy, cross_entropy_value = sess.run([evaluation_step, cross_entropy], feed_dict={bottleneck_input: train_bottlenecks, labels_input: train_labels})
-                        validation_bottlenecks, validation_labels, _ = get_cached_bottlenecks(sess, image_lists, FLAGS.validation_batch_size, 'validation', FLAGS.bottleneck_dir, FLAGS.image_dir, jpeg_data_tensor, decoded_image_tensor, resized_image_tensor, bottleneck_tensor, FLAGS.tfhub_module)
-                        validation_summary, validation_accuracy = sess.run([merged, evaluation_step], feed_dict={bottleneck_input: validation_bottlenecks, labels_input: validation_labels})
-                        validation_writer.add_summary(validation_summary, i)
-                        tf.logging.info('%s: DA Step %d: Train accuracy = %.1f%% Cross entropy = %f Validation accuracy = %.1f%% (N=%d)' % (datetime.now(), i, train_accuracy * 100, cross_entropy_value, validation_accuracy * 100, len(validation_bottlenecks)))
-                except KeyboardInterrupt:
-                    tf.logging.info('%s: Keyboard Interrupt, will stop DA training')
-                    break
-                if intermediate_frequency > 0 and i % intermediate_frequency == 0 and i > 0:
-                    train_saver.save(sess, FLAGS.checkpoint_path)
-                    intermediate_file_name = (FLAGS.intermediate_output_graphs_dir + 'intermediate_' + str(i) + '.pb')
-                    tf.logging.info('Save intermediate result to : ' + intermediate_file_name)
-                    save_graph_to_file(intermediate_file_name, module_spec, class_count)
 
         # After training is complete, force one last save of the train checkpoint.
         train_saver.save(sess, FLAGS.checkpoint_path)

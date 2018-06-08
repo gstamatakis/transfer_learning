@@ -44,7 +44,7 @@ training_parser.add_argument(
 training_parser.add_argument(
     '--how_many_training_steps',
     type=int,
-    default=1000,
+    default=100,
     help='How many training steps to run before ending.'
 )
 training_parser.add_argument(
@@ -143,26 +143,26 @@ training_parser.add_argument(
 )
 training_parser.add_argument(
     '--flip_left_right',
-    default=True,
+    default=False,
     help=r'Randomly flip half of the images.',
     action='store_true'
 )
 training_parser.add_argument(
     '--random_crop',
     type=int,
-    default=10,
+    default=0,
     help='A percentage determining how much of a margin to randomly crop off the training images.'
 )
 training_parser.add_argument(
     '--random_scale',
     type=int,
-    default=10,
+    default=0,
     help=r'A percentage determining how much to randomly scale up the size of the training images by.'
 )
 training_parser.add_argument(
     '--random_brightness',
     type=int,
-    default=10,
+    default=0,
     help="""\
       A percentage determining how much to randomly multiply the training image
       input pixels up or down by.\
@@ -196,12 +196,6 @@ training_parser.add_argument(
     type=int,
     default=20,
     help='Label folders with less than this number will NOT be used.')
-
-training_parser.add_argument(
-    '--repeat',
-    type=int,
-    default=2,
-    help='Repeat training with data augmentation enabled for this many rounds. (eg. 4 means that a single image will be fed 5 times in the network).')
 
 training_parser.add_argument(
     '--max_images_per_label',
