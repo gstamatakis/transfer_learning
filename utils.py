@@ -214,7 +214,7 @@ def get_or_create_bottleneck(sess, image_lists, label_name, index, image_dir, ca
     return bottleneck_values
 
 
-def get_random_cached_bottlenecks(sess, images, how_many, category, bottleneck_dir, image_dir, jpeg_tensor, decoded_image_tensor, resized_input_tensor, bottleneck_tensor, module_name):
+def get_cached_bottlenecks(sess, images, how_many, category, bottleneck_dir, image_dir, jpeg_tensor, decoded_image_tensor, resized_input_tensor, bottleneck_tensor, module_name):
     """Retrieves bottleneck values for cached images.
 
     If no distortions are being applied, this function can retrieve the cached
@@ -267,8 +267,7 @@ def get_random_cached_bottlenecks(sess, images, how_many, category, bottleneck_d
     return bottlenecks, labels, filenames
 
 
-def get_random_distorted_bottlenecks(
-        sess, image_lists, how_many, category, image_dir, input_jpeg_tensor, distorted_image, resized_input_tensor, bottleneck_tensor):
+def get_distorted_bottlenecks(sess, image_lists, how_many, category, image_dir, input_jpeg_tensor, distorted_image, resized_input_tensor, bottleneck_tensor):
     """Retrieves bottleneck values for training images, after distortions.
 
     If we're training with distortions like crops, scales, or flips, we have to
