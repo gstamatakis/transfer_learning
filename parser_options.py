@@ -1,6 +1,10 @@
 import argparse
+import os
 
-training_parser = argparse.ArgumentParser(description=r'Image retraining')
+# Disables AVX warnings
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+
+training_parser = argparse.ArgumentParser(description=r'Transfer learning with Tensorflow.')
 training_parser.add_argument(
     '--image_dir',
     type=str,
@@ -108,22 +112,16 @@ training_parser.add_argument(
     type=int,
     default=-1,
     help="""
-      How many images to test on. This test set is only used once, to evaluate
-      the final accuracy of the model after training completes.
-      A value of -1 causes the entire test set to be used, which leads to more
-      stable results across runs."""
+      How many images to test on. This test set is only used once, to evaluate the final accuracy of the model after training completes.
+      A value of -1 causes the entire test set to be used, which leads to more stable results across runs."""
 )
 training_parser.add_argument(
     '--validation_batch_size',
     type=int,
     default=-1,
     help=r"""
-      How many images to use in an evaluation batch. This validation set is
-      used much more often than the test set, and is an early indicator of how
-      accurate the model is during training.
-      A value of -1 causes the entire validation set to be used, which leads to
-      more stable results across training iterations, but may be slower on large
-      training sets."""
+      How many images to use in an evaluation batch. This validation set is used much more often than the test set, and is an early indicator of how accurate the model is during training.
+      A value of -1 causes the entire validation set to be used, which leads to more stable results across training iterations, but may be slower on large training sets."""
 )
 training_parser.add_argument(
     '--bottleneck_dir',
@@ -145,26 +143,26 @@ training_parser.add_argument(
 )
 training_parser.add_argument(
     '--flip_left_right',
-    default=True,
+    default=False,
     help=r'Randomly flip half of the images.',
     action='store_true'
 )
 training_parser.add_argument(
     '--random_crop',
     type=int,
-    default=10,
+    default=0,
     help='A percentage determining how much of a margin to randomly crop off the training images.'
 )
 training_parser.add_argument(
     '--random_scale',
     type=int,
-    default=10,
+    default=0,
     help=r'A percentage determining how much to randomly scale up the size of the training images by.'
 )
 training_parser.add_argument(
     '--random_brightness',
     type=int,
-    default=10,
+    default=0,
     help="""\
       A percentage determining how much to randomly multiply the training image
       input pixels up or down by.\

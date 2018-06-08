@@ -6,7 +6,7 @@ def load_graph(model_file):
     graph = tf.Graph()
     graph_def = tf.GraphDef()
 
-    with open(model_file, "rb") as f:
+    with open(model_file, "rb") as f:  # The .pb graph
         graph_def.ParseFromString(f.read())
     with graph.as_default():
         tf.import_graph_def(graph_def)
@@ -45,7 +45,7 @@ if __name__ == "__main__":
         })
     results = np.squeeze(results)
 
-    top_k = results.argsort()[-5:][::-1]
+    top_k = results.argsort()[-5:][::-1]  # Print only the top 5
     labels = load_labels(testFLAGS.labels)
     for i in top_k:
         print(labels[i], results[i])

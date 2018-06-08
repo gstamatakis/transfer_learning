@@ -15,6 +15,7 @@ import tensorflow_hub as hub
 from parser_options import FLAGS
 
 
+# From Google
 def create_image_lists(image_dir, testing_percentage, validation_percentage):
     """Builds a list of training images from the file system.
 
@@ -103,10 +104,8 @@ def get_image_path(image_lists, label_name, index, image_dir, category):
       label_name: The label name.
       index: Int offset of the image we want. This will be moded (%) by the
       available number of images for the label, so it can be arbitrarily large.
-      image_dir: Root folder string of the subfolders containing the training
-      images.
-      category: Name string of set to pull images from - training, testing, or
-      validation.
+      image_dir: Root folder string of the subfolders containing the training images.
+      category: Name string of set to pull images from - training, testing, or validation.
 
     Returns:
       File system path string to an image that meets the requested parameters.
@@ -155,6 +154,7 @@ def create_bottleneck_file(bottleneck_path, image_lists, label_name, index, imag
         bottleneck_file.write(bottleneck_string)
 
 
+# From Google
 def get_or_create_bottleneck(sess, image_lists, label_name, index, image_dir, category, bottleneck_dir, jpeg_data_tensor, decoded_image_tensor, resized_input_tensor, bottleneck_tensor, module_name):
     """Retrieves or calculates bottleneck values for an image.
 
@@ -296,7 +296,7 @@ def get_random_distorted_bottlenecks(
     class_count = len(image_lists.keys())
     bottlenecks = []
     labels = []
-    for unused_i in range(how_many):
+    for _ in range(how_many):
         label_index = random.randrange(class_count)
         label_name = list(image_lists.keys())[label_index]
         image_index = random.randrange(FLAGS.max_images_per_label + 1)
@@ -304,9 +304,6 @@ def get_random_distorted_bottlenecks(
         if not tf.gfile.Exists(image_path):
             tf.logging.fatal('File does not exist %s', image_path)
         jpeg_data = tf.gfile.FastGFile(image_path, 'rb').read()
-        # Note that we materialize the distorted_image_data as a numpy array before
-        # sending running inference on the image. This involves 2 memory copies and
-        # might be optimized in other implementations.
         distorted_image_data = sess.run(distorted_image, {input_jpeg_tensor: jpeg_data})
         bottleneck_values = sess.run(bottleneck_tensor, {resized_input_tensor: distorted_image_data})
         bottleneck_values = np.squeeze(bottleneck_values)
@@ -316,111 +313,26 @@ def get_random_distorted_bottlenecks(
 
 
 def add_input_distortions(flip_left_right, random_crop, random_scale, random_brightness, module_spec):
-    """Creates the operations to apply the specified distortions.
-
-    During training it can help to improve the results if we run the images
-    through simple distortions like crops, scales, and flips. These reflect the
-    kind of variations we expect in the real world, and so can help train the
-    model to cope with natural data more effectively. Here we take the supplied
-    parameters and construct a network of operations to apply them to an image.
-
-    Cropping
-    ~~~~~~~~
-
-    Cropping is done by placing a bounding box at a random position in the full
-    image. The cropping parameter controls the size of that box relative to the
-    input image. If it's zero, then the box is the same size as the input and no
-    cropping is performed. If the value is 50%, then the crop box will be half the
-    width and height of the input. In a diagram it looks like this:
-
-    <       width         >
-    +---------------------+
-    |                     |
-    |   width - crop%     |
-    |    <      >         |
-    |    +------+         |
-    |    |      |         |
-    |    |      |         |
-    |    |      |         |
-    |    +------+         |
-    |                     |
-    |                     |
-    +---------------------+
-
-    Scaling
-    ~~~~~~~
-
-    Scaling is a lot like cropping, except that the bounding box is always
-    centered and its size varies randomly within the given range. For example if
-    the scale percentage is zero, then the bounding box is the same size as the
-    input and no scaling is applied. If it's 50%, then the bounding box will be in
-    a random range between half the width and height and full size.
-
-    Args:
-      flip_left_right: Boolean whether to randomly mirror images horizontally.
-      random_crop: Integer percentage setting the total margin used around the
-      crop box.
-      random_scale: Integer percentage of how much to vary the scale by.
-      random_brightness: Integer range to randomly multiply the pixel values by.
-      graph.
-      module_spec: The hub.ModuleSpec for the image module being used.
-
-    Returns:
-      The jpeg input layer and the distorted result tensor.
-    """
     input_height, input_width = hub.get_expected_image_size(module_spec)
     input_depth = hub.get_num_image_channels(module_spec)
     jpeg_data = tf.placeholder(tf.string, name='DistortJPGInput')
-    decoded_image = tf.image.decode_jpeg(jpeg_data, channels=input_depth)
-    # Convert from full range of uint8 to range [0,1] of float32.
-    decoded_image_as_float = tf.image.convert_image_dtype(decoded_image, tf.float32)
-    decoded_image_4d = tf.expand_dims(decoded_image_as_float, 0)
-    margin_scale = 1.0 + (random_crop / 100.0)
-    resize_scale = 1.0 + (random_scale / 100.0)
-    margin_scale_value = tf.constant(margin_scale)
-    resize_scale_value = tf.random_uniform(shape=[], minval=1.0, maxval=resize_scale)
-    scale_value = tf.multiply(margin_scale_value, resize_scale_value)
-    precrop_width = tf.multiply(scale_value, input_width)
-    precrop_height = tf.multiply(scale_value, input_height)
-    precrop_shape = tf.stack([precrop_height, precrop_width])
-    precrop_shape_as_int = tf.cast(precrop_shape, dtype=tf.int32)
-    precropped_image = tf.image.resize_bilinear(decoded_image_4d, precrop_shape_as_int)
-    precropped_image_3d = tf.squeeze(precropped_image, axis=[0])
-    cropped_image = tf.random_crop(precropped_image_3d, [input_height, input_width, input_depth])
+    decoded_image = tf.image.convert_image_dtype(tf.image.decode_jpeg(jpeg_data, channels=input_depth), tf.float32)
+    scale_value = tf.multiply(tf.constant(1.0 + (random_crop / 100.0)), tf.random_uniform(shape=[], minval=1.0, maxval=1.0 + (random_scale / 100.0)))
+    precrop_shape = tf.cast(tf.stack([tf.multiply(scale_value, input_height), tf.multiply(scale_value, input_width)]), dtype=tf.int32)
+    precropped_image = tf.squeeze(tf.image.resize_bilinear(tf.expand_dims(decoded_image, 0), precrop_shape), axis=[0])
+    cropped_image = tf.random_crop(precropped_image, [input_height, input_width, input_depth])
     if flip_left_right:
         flipped_image = tf.image.random_flip_left_right(cropped_image)
     else:
-        flipped_image = cropped_image
-    brightness_min = 1.0 - (random_brightness / 100.0)
-    brightness_max = 1.0 + (random_brightness / 100.0)
-    brightness_value = tf.random_uniform(shape=[], minval=brightness_min, maxval=brightness_max)
-    brightened_image = tf.multiply(flipped_image, brightness_value)
-    distort_result = tf.expand_dims(brightened_image, 0, name='DistortResult')
+        flipped_image = cropped_image  # Do nothing
+    brightness_value = tf.random_uniform(shape=[], minval=1.0 - (random_brightness / 100.0), maxval=1.0 + (random_brightness / 100.0))
+    distort_result = tf.expand_dims(tf.multiply(flipped_image, brightness_value), 0, name='DistortResult')
     return jpeg_data, distort_result
 
 
-def add_final_retrain_ops(class_count, final_tensor_name, bottleneck_tensor, is_training):
-    """Adds a new softmax and fully-connected layer for training and eval.
+def add_retrain_operations(class_count, final_tensor_name, bottleneck_tensor, is_training):
+    """Adds a new softmax and fully-connected layer for training and eval."""
 
-    We need to retrain the top layer to identify our new classes, so this function
-    adds the right operations to the graph, along with some variables to hold the
-    weights, and then sets up all the gradients for the backward pass.
-
-    The set up for the softmax and fully-connected layers is based on:
-    https://www.tensorflow.org/tutorials/mnist/beginners/index.html
-
-    Args:
-      class_count: Integer of how many categories of things we're trying to
-          recognize.
-      final_tensor_name: Name string for the new final node that produces results.
-      bottleneck_tensor: The output of the main CNN graph.
-      is_training: Boolean, specifying whether the newly add layer is for training
-          or eval.
-
-    Returns:
-      The tensors for the training and cross entropy results, and tensors for the
-      bottleneck input and ground truth input.
-    """
     batch_size, bottleneck_tensor_size = bottleneck_tensor.get_shape().as_list()
     with tf.name_scope('input'):
         bottleneck_input = tf.placeholder_with_default(bottleneck_tensor, shape=[batch_size, bottleneck_tensor_size], name='BottleneckInputPlaceholder')
@@ -442,6 +354,7 @@ def add_final_retrain_ops(class_count, final_tensor_name, bottleneck_tensor, is_
 
     tf.summary.scalar('cross_entropy', cross_entropy_mean)
 
+    # Chose an optimiser
     with tf.name_scope('train'):
         opt = FLAGS.optimizer
         if opt == 'sgd':
@@ -478,27 +391,6 @@ def add_evaluation_step(result_tensor, label_tensor):
     return evaluation_step, prediction
 
 
-def run_final_eval(train_session, module_spec, class_count, image_lists, jpeg_data_tensor, decoded_image_tensor, resized_image_tensor, bottleneck_tensor):
-    """Runs a final evaluation on an eval graph using the test data set.
-
-    Args:
-      train_session: Session for the train graph with the tensors below.
-      module_spec: The hub.ModuleSpec for the image module being used.
-      class_count: Number of classes
-      image_lists: OrderedDict of training images for each label.
-      jpeg_data_tensor: The layer to feed jpeg image data into.
-      decoded_image_tensor: The output of decoding and resizing the image.
-      resized_image_tensor: The input node of the recognition graph.
-      bottleneck_tensor: The bottleneck output layer of the CNN graph.
-    """
-    test_bottlenecks, test_label, test_filenames = (get_random_cached_bottlenecks(
-        train_session, image_lists, FLAGS.test_batch_size, 'testing', FLAGS.bottleneck_dir, FLAGS.image_dir, jpeg_data_tensor, decoded_image_tensor, resized_image_tensor, bottleneck_tensor, FLAGS.tfhub_module))
-
-    (eval_session, _, bottleneck_input, label_input, evaluation_step, prediction) = build_eval_session(module_spec, class_count)
-    test_accuracy, predictions = eval_session.run([evaluation_step, prediction], feed_dict={bottleneck_input: test_bottlenecks, label_input: test_label})
-    tf.logging.info('Test accuracy = %.1f%% (N=%d)' % (test_accuracy * 100, len(test_bottlenecks)))
-
-
 def build_eval_session(module_spec, class_count):
     """Builds an restored eval session without train operations for exporting."""
 
@@ -507,7 +399,7 @@ def build_eval_session(module_spec, class_count):
     eval_sess = tf.Session(graph=eval_graph)
     with eval_graph.as_default():
         # Add the new layer for exporting.
-        (_, _, bottleneck_input, label_input, final_tensor) = add_final_retrain_ops(class_count, FLAGS.final_tensor_name, bottleneck_tensor, is_training=False)
+        (_, _, bottleneck_input, label_input, final_tensor) = add_retrain_operations(class_count, FLAGS.final_tensor_name, bottleneck_tensor, is_training=False)
         # Now we need to restore the values from the training graph to the eval graph.
         tf.train.Saver().restore(eval_sess, FLAGS.checkpoint_path)
         evaluation_step, prediction = add_evaluation_step(final_tensor, label_input)
