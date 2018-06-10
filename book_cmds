@@ -1,3 +1,5 @@
+Cmds used to deploy the model to the google cluster.
+
 %cd /content/
 !ls
 !rm -rf exp f.zip transfer_learning/ retraining/

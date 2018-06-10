@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from utils import *
+from code.utils_google import *
 
 
 def main(_):
@@ -71,7 +71,7 @@ def main(_):
         train_saver = tf.train.Saver()
 
         # Run the training for as many cycles as requested on the command line.
-        for i in range(FLAGS.how_many_training_steps):
+        for i in range(FLAGS.steps):
             try:
                 # Get a batch of input bottleneck values, either calculated fresh every time with distortions applied, or from the cache stored on disk.
                 if has_distoreted_images:
@@ -84,7 +84,7 @@ def main(_):
                 train_writer.add_summary(train_summary, i)
 
                 # Every so often, print out how well the graph is training.
-                if i % FLAGS.eval_step_interval == 0 or i + 1 == FLAGS.how_many_training_steps:
+                if i % FLAGS.eval_step_interval == 0 or i + 1 == FLAGS.steps:
                     train_accuracy, cross_entropy_value = sess.run([evaluation_step, cross_entropy], feed_dict={bottleneck_input: train_bottlenecks, labels_input: train_labels})
                     validation_bottlenecks, validation_labels, _ = get_cached_bottlenecks(sess, image_lists, FLAGS.validation_batch_size, 'validation', FLAGS.bottleneck_dir, FLAGS.image_dir, jpeg_data_tensor, decoded_image_tensor, resized_image_tensor, bottleneck_tensor, FLAGS.tfhub_module)
                     # Run the validation step

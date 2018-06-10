@@ -1,7 +1,11 @@
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import argparse
 import os
 
-# Disables AVX warnings
+# Disables tensorflow AVX compile warnings
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 training_parser = argparse.ArgumentParser(description=r'Transfer learning with Tensorflow.')
@@ -20,7 +24,7 @@ training_parser.add_argument(
 training_parser.add_argument(
     '--intermediate_output_graphs_dir',
     type=str,
-    default=r'E:\tf_proj1\intermediate_graph',
+    default='',
     help='Where to save the intermediate graphs.'
 )
 training_parser.add_argument(
@@ -42,9 +46,9 @@ training_parser.add_argument(
     help='Where to save summary logs for TensorBoard.'
 )
 training_parser.add_argument(
-    '--how_many_training_steps',
+    '--steps',
     type=int,
-    default=100,
+    default=200,
     help='How many training steps to run before ending.'
 )
 training_parser.add_argument(
@@ -104,7 +108,7 @@ training_parser.add_argument(
 training_parser.add_argument(
     '--train_batch_size',
     type=int,
-    default=32,
+    default=16,
     help='How many images to train on at a time.'
 )
 training_parser.add_argument(
@@ -172,12 +176,11 @@ training_parser.add_argument(
 # "https://tfhub.dev/google/imagenet/nasnet_large/feature_vector/1"
 # "https://tfhub.dev/google/imagenet/inception_resnet_v2/feature_vector/1"
 # "https://tfhub.dev/google/imagenet/inception_v3/feature_vector/1"
-
 training_parser.add_argument(
     '--tfhub_module',
     type=str,
     default='https://tfhub.dev/google/imagenet/inception_resnet_v2/feature_vector/1',
-    help='Which TensorFlow Hub module to use.')
+    help='Which TensorFlow Hub module to use. This is the pretrained NN, will be automatically downloaded if it doesnt exist!')
 
 training_parser.add_argument(
     '--saved_model_dir',

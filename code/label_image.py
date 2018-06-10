@@ -1,5 +1,6 @@
-from parser_options import *
-from utils import *
+from code.parser_options import *
+from code.utils import *
+import numpy as np
 
 
 def load_graph(model_file):
@@ -41,8 +42,13 @@ if __name__ == "__main__":
 
     with tf.Session(graph=graph) as sess:
         results = sess.run(output_operation.outputs[0], {
-            input_operation.outputs[0]: read_tensor_from_image_file(testFLAGS.image, input_height=testFLAGS.input_height, input_width=testFLAGS.input_width, input_mean=testFLAGS.input_mean, input_std=testFLAGS.input_std)
+            input_operation.outputs[0]: read_tensor_from_image_file(testFLAGS.image,
+                                                                    input_height=testFLAGS.input_height,
+                                                                    input_width=testFLAGS.input_width,
+                                                                    input_mean=testFLAGS.input_mean,
+                                                                    input_std=testFLAGS.input_std)
         })
+
     results = np.squeeze(results)
 
     top_k = results.argsort()[-5:][::-1]  # Print only the top 5
