@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from code.utils_google import *
+from scripts.utils_google import *
 
 
 def main(_):

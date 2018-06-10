@@ -1,5 +1,5 @@
-from code.parser_options import *
-from code.utils import *
+from scripts.parser_options import *
+from scripts.utils import *
 import numpy as np
 
 

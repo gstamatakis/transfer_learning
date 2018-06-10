@@ -6,7 +6,7 @@ import re
 
 import numpy as np
 
-from code.utils import *
+from scripts.utils import *
 
 
 # All functions in this file have been taken from the tensorflow slim main github repo and were slightly altered.

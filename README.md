@@ -4,7 +4,8 @@ Giorgos Stamatakis - 2013 030 154
 Giorgos Dialektatkis - 2014 030 178         
 
 #Running/Deploying the model
-Scrips are placed in the code directory.
+The model can be trained using the transfer_learning.py and tested using the label_image.py scripts (more on that in the next section).
+Utilities and scrips are placed in the scripts directory.
 The report ,along with some experiment, graphs is placed in the docs folder.
 To deploy (or use in an ipython notebook) consult the book_cmds in the docs folder.
 
@@ -17,6 +18,8 @@ All params are set to some default values but some must be changed as they are O
 
 You need to set the dataset path and the output paths for a few different things (labels,graph,summaries...)
 Simply replace the "E:\tf_proj1" part in every arg with the desired path in your FS.
+
+Steps are the number of full passes that will be performed, one step means that one batch will be passed exactly once.
 
 #Dataset
 Flowers dataset can be found here: 

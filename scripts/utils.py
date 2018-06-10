@@ -3,7 +3,7 @@ import os.path
 import tensorflow as tf
 import tensorflow_hub as hub
 
-from code.parser_options import FLAGS
+from scripts.parser_options import FLAGS
 
 
 def get_image_path(image_lists, label_name, index, image_dir, category):
